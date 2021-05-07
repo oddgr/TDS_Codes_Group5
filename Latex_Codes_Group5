@@ -1,0 +1,447 @@
+% VLDB template version of 2020-08-03 enhances the ACM template, version 1.7.0:
+% https://www.acm.org/publications/proceedings-template
+% The ACM Latex guide provides further information about the ACM template
+
+\documentclass[sigconf, nonacm,openany,oneside]{acmart}
+\usepackage{pdfpages}
+\usepackage[export]{adjustbox}% http://ctan.org/pkg/adjustbox
+%% The following content must be adapted for the final version
+% paper-specific
+\newcommand\vldbdoi{XX.XX/XXX.XX}
+\newcommand\vldbpages{XXX-XXX}
+% issue-specific
+\newcommand\vldbvolume{14}
+\newcommand\vldbissue{1}
+\newcommand\vldbyear{2020}
+% should be fine as it is
+\newcommand\vldbauthors{\authors}
+\newcommand\vldbtitle{\shorttitle} 
+% leave empty if no availability url should be set
+\newcommand\vldbavailabilityurl{http://vldb.org/pvldb/format_vol14.html}
+% whether page numbers should be shown or not, use 'plain' for review versions, 'empty' for camera ready
+\newcommand\vldbpagestyle{plain} 
+
+\begin{document}
+\title{Risk Factors for Breast Cancer: An In-depth Analysis of UK Biobank Data}
+
+%%
+%% The "author" command and its associated commands are used to define the authors and their affiliations.
+\author{CID: 01913993, 01814471, 01808753, 01333689, 01377486, 01902920}
+\affiliation{%
+  \institution{Imperial College London}
+}
+
+
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+
+\textbf{\underline{Introduction}}: Breast cancer is one of the foremost cancers in women and the second most common cancer in the world. As the incidence of breast cancer in women has kept on increment in the past two decades, exploring risk factors for breast cancer has been progressively recognised by authorities and researchers. Risk factors of breast cancer have been shown to be multi-factorial. In this study, joint effects and co-occurring patterns between predictors and breast cancer will be explored. 
+
+\textbf{\underline{Methods}}: The UK Biobank dataset was used to study 43 variables of 8 categories in our study cohort, including demographic, socioeconomic, lifestyle, health risk, medical history, female-specific, biomarkers and environmental exposure. We used principal component analysis to recognize major dietary patterns of diet items. Univariate and multivariate logistic regression models were used to measure the risk for each covariate to the development of breast cancer and its subtypes. We additionally accounted for correlation across covariates using logistic LASSO regression. To evaluate joint effects on breast cancer and its subtypes, we also performed a series of PLS-DA to select the most relevant set of covariates with relation to breast cancer status. Furthermore, to validate for our findings, sensitivity analysis was conducted by family history of breast cancer, stillbirth situation, menopause status, oral contraceptive use and age at menarche. 
+
+\textbf{\underline{Results}}: 
+Consistent associations have been found across different methods. Among all models, variables recruitment age, family history of breast cancer, and hypertension were positively associated with the future risk of female breast cancer and its subtypes (inner quadrant and outer quadrant), while Black and Other ethnicities showed a protective effect. In sgPLS-DA, demographic and female-specific variables were associated in pooled and outer subtype; demographic and health risk factors were selected for the inner subtype. Lastly, sensitivity analysis demonstrated no substantial mismatch between the stratified study population and outcome. 
+
+\textbf{\underline{Conclusion}}: 
+The study found that post-menopausal, older, hypertensive, first-degree family history contributes to an increased risk of breast cancer development. Our research provides a theoretical basis for risk factors for breast cancer and contributes to the understanding of the pathogenesis of breast cancer.
+
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+Breast cancer is one of the most common types of cancer amongst women and the second most commonly occurring cancer worldwide. In total, there were approximately 2.1 million diagnoses recorded in 2018, contributing to over 11.6\% incidence burden of all the cancer types, according to the latest data from the International Agency for Research on Cancer [1]. The breast cancer incidence is relatively higher in developed countries such as Europe and Northern America [2]. Female breast cancer contributes to around 627,000 deaths in 2018 globally, which ranks as the fifth leading cause of death (6.6\%)[3]. More than 80\% of the female breast cancer incidence was diagnosed at middle-aged in the UK (aged 50+). With the consistent growing trend of breast cancer incidence in women in recent years [4], identifying risk factors of breast cancer becomes increasingly crucial.
+
+Contribution of risk factors on breast cancer have been shown to be multi-factorial. Some factors identified in the previous studies were related to population structure (age, ethnicity), environmental exposures, lifestyle, reproductive factors (menopause status, exogenous hormone intake) and the accumulated effect of anthropometric factors (body mass index, waist circumference) [5]. However, existing research were reported on relatively limited sample sizes, revealing few definite effects using linear mixed models, and left a broad scope of uncertainty. Our study will estimate associations of risk factors and biological markers using penalised methods and partial least squares models along with calibration procedures to identify sets of variables associated with future risk of breast cancer and its subtypes (inner quadrant and outer quadrant) in the UK Biobank cohort.
+
+
+
+\section{Methods}
+\subsection{Study population and data sources}
+The UK Biobank is a large prospective cohort consisting of 502,536 participants aged 37-73 (recruited across England, Wales and Scotland between 2006 and 2010). Comprehensive data were provided by each participant on a broad range of demographic, clinical, lifestyle, environmental, genetic and social outcomes, including clinical measurements using standardised protocols and face-to-face interviews at 22 assessment centres.[6] 
+According to Public Health England statistics in 2017, women aged between 50 and 69 contributed to 50\% of the total incidence of breast cancer cases. Although males could also develop breast cancer, the total incidence is considerably lower than in females (1:99 ratio) [3]. Thus, we put our focus solely on the female population in this study. 
+
+Of the 502,537 participants, we excluded (i) 31 non-consenting participants, (ii) 229,122 males, (iii) 74,105 participants diagnosed with another type of cancer and benign neoplasms, (iv) 33,208 individuals with missing menopause status and hysterectomy status, (v) 3,349 prevalent cases of diagnosed breast cancer before recruitment and within one year of entry, and (vi) 6,266 participants with missing three or four of these variables: average total household income, exposed to breastfeeding as a baby, exposed to maternal smoking around birth and family breast cancer history, leaving 156,456 participants for the analysis. The missing proportion of all variables was less than 15\%, thereby justifying the use of imputation on the remaining missing values.
+
+
+\subsection{Outcome variable}
+With linkage to the Hospital Episode Statistics data (HES), we identified 4,228 cases of malignant neoplasms of the breast using C50 from ICD-10 and 179 from ICD-9. Further stratification was conducted by categorising inner quadrant subtype (C50.2 upper-inner quadrant and C50.3 lower-inner quadrant, n = 624) and outer quadrant subtype (C50.4 upper-outer quadrant and C50.5 lower-outer quadrant, n = 1225).
+
+\subsection{Predictors}
+A total of 43 variables have been studied in our study cohort and could be categorised into 8 groups: demographic, socioeconomic, lifestyle, health risk, medical history, female-specific, biomarkers and environmental exposure. Demographic variables included age recorded at the time of study recruitment and ethnicity defined by the following categories: White, Black, Asian and other ethnic groups.
+
+Socioeconomic variables included Townsend deprivation index, education levels measured by three categories in descending order: High (College or University degree), Intermediate (A/AS levels, O levels/GCSE, other equivalent professional qualifications) and Low (none of the above). 
+Housing information included types of accommodation (house, flat, other facilities), number of individuals living in a household ($<3$, $\geq 3$), whether accommodation was owned or rented, average household income ($<$£18,000; £18,000–30,999; £31,000–51,999; $>$£52,000) and current employment status (unemployed, employed, retired).
+
+Lifestyle factors consisted of smoking status (current, previous, never), alcohol drinking habits (current, previous, never), average sleep duration ($<$7 hours, 7-8 hours, $>$8 hours), frequency of insomnia (rarely, sometimes, usually), physical activity status (days of moderate activity, days of vigorous activity), exposed to breastfeeding as baby, exposed to maternal smoking around birth and dietary information summarised by three principal components. 
+
+Health-risk factors included physical measurements of waist circumference in cm and BMI in kg/m$^2$($<$25, 25-30, 30-40, $>$40).
+
+Disease status of comorbidities diagnosed before recruitment was derived from the linked HES database for cardiovascular diseases, hypertension, diabetes and respiratory diseases. 
+
+Female-specific variables included a series of reproductive and breast cancer related factors, consisting of menarche age, menopause status, family history of breast cancer, number of live births ($<$1, 1-3 births, $>$3), history of stillbirth or birth terminations, history of oral contraceptive use and history of hormone replacement therapy.
+
+Biomarker levels were collected from triglycerides, glycated haemoglobin (HbA1c), glucose, high density lipoprotein (HDL), sex hormone-binding globulin (SHBG) and insulin-like growth factor (IGF-1). Environmental exposures were assessed using air quality and noise pollution, including levels of Nitrogen oxides, PM10, PM2.5 and average sound level of 24 hours.
+
+\subsection{Statistical analysis}
+We provided means ($\pm$ standard deviation) and proportions for descriptive analysis. Categorically variables were assessed using Chi-squared test and T-test was used to compare continuous variables. Categorical variables in the dataset had undergone one-hot encoding with the baseline column for each dummy variable removed to act as a reference category for subsequent analysis.
+
+The principal component analysis (PCA) was used to recognise major dietary patterns with regards to 18 food items. PCA is often regarded as an exploratory method to derive dietary patterns from habitual diets, which can characterise food intake with different levels of food consumption [7]. Principal components were chosen by the factor loadings and the scree plot. Foods with loadings above $|\geq0.3|$ on a component were considered to contribute significantly to the dietary pattern [8]. Dietary patterns referred to the factors with eigenvalues $>$1.0 and they were determined by the break in the scree plot and the interpretability of each identified pattern [9]. Factor scores were calculated for each of the derived patterns by summing the products of the observed consumption frequency and the factor loading for each of the significant food groups [10]. 
+
+We used univariate and multivariate logistic regression models to measure the risk for each covariate to the development of breast cancer (breast cancer cases vs controls) and its subtypes (inner breast cancer and outer breast cancer). In order to account for potential confounding, we further adjusted on recruitment age and BMI. Continuous variables were standardised to ensure comparability of Odds Ratios (ORs), per standard deviation increase.  
+
+We additionally accounted for correlation across covariates using logistic LASSO regression, calibrated using Area under the ROC Curve (AUC) with cross-validation. This method identified a parsimonious set of variables and estimated joint effects explaining risks of breast cancer and its subtypes. In order to measure prediction performance using ROC Curve, we used 80\% subsamples as training sets and calculated the AUC in the remaining 20\% test sets.
+
+To evaluate the joint effect on breast cancer and its histological subtypes, we also performed a series of Partial Least Squares – Discriminant Analysis (PLS-DA) to select the most relevant set of covariates with relation to breast cancer status. The first component was used for PLS-DA and penalty calibration was conducted on the variables to induce sparsity on the covariates in each subsequent model. Calibrations for each model were conducted using 5-folds cross validation over 100 iterations, selecting the optimal parameters that result in the lowest misclassification rate in sPLS-DA with an additional penalty parameter in sgPLS-DA. Due to major class imbalance, downsampling algorithm from the ROSE package [11] was applied to the majority class to aid the process of sparsity calibration for each sPLS-DA model. To explore the consistency of variable selection in each sPLS-DA analysis, we further conducted stability analyses by sub-sampling 80\% of the participants over 100 iterations, the threshold of stability selection would be equivalent to the number of variables calibrated in each PLS-DA model and the variables that were considered stably selected would have a selection proportion of over 80\% at the cut-off. In addition, in order to capture the effect of functional groupings in the model, group PLS-DA (gPLS-DA) and sparse group PLS-DA (sgPLS-DA) were conducted to implement prior knowledge of group membership on the covariates. Variables from the medical history category had been combined into the health risk group in sgPLS analysis to provide a more informative grouping structure, hence a total of 7 categories were applied.
+
+To account for multiple confounding, we sequentially adjusted for (i) demographics, (ii) social factors, (iii) health risk factors, (iv)female-specific factors, (v) lifestyle factors, (vi) medical risk factors, (vii) environmental factors, and (viii) biomarkers. Sensitivity analysis was conducted by separately considering models with stratification on family history of breast cancer, history of stillbirth , menopause status, history of oral contraceptives use and menarche age (early, normal, late).
+All analyses were performed in R, version 4.0.3.
+
+\section{Results}
+
+\subsection{Dietary pattern}
+With the use of PCA analysis, three principal components (PCs) were generated from 18 food groups as shown in Table \ref{tbl:PC.png}. Table 1 also presents the factor-loading matrices. PC1 presented meat dietary pattern, which was identified with high consumption of processed meat intake, poultry intake, beef intake, lamb intake and pork intake. PC2 represented a healthier dietary pattern, which was identified with high intakes of cooked vegetable, raw vegetable, fresh fruit, dried fruit, oily fish, non-oily fish and water. PC3 illustrated an relatively unhealthy dietary pattern with high intake on beverages, which was associated with more coffee and alcohol intake and less tea and cereal intake. In total, 32\% of the variances were explained by these dietary structures[supplementary figure \ref{fig:Scree plot.png}], which was in line with other studies [12]. We replaced 18 diet items with three PCs in the following analysis. 
+
+\subsection{Participants characteristics }
+Descriptive statistics comparing those diagnosed breast cancer after 1 year of study entry (n = 4228) and healthy controls (n = 152228) from our study population (N = 156456) were shown in Table \ref{tbl:table1.png}. For each variable, the differences between the case and control populations were evaluated using a student’s t-test for continuous variables, and chi-squared test for categorical variables. 
+
+\begin{table}[h]
+  \caption{Factor loadings of major dietary patterns}
+  \label{tbl:PC.png}
+  \includegraphics[width=\linewidth]{PC.png}
+\end{table}
+
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=\linewidth]{PC.png}
+%   \caption{Table 1 Factor loadings of major dietary patterns}
+%   \label{fig:PC.png}
+% \end{figure}
+
+
+
+\begin{table*}[h]
+  \caption{Characteristics of the control and case populations for breast cancer in the UK Biobank study}
+  \label{tbl:table1.png}
+  \includegraphics[width=\linewidth]{table1.png}
+\end{table*}
+
+\subsection{Univariate logistic regression analysis}
+The univariate logistic regression analysis indicated significant associations between breast cancer and SHBG levels (OR=0.94, 95\% CI [0.92, 0.97]), Black ethnicity (OR=0.53, 95\% CI [0.39, 0.71]; Black vs. White), menopause status (OR=1.41, 95\% CI [1.31, 1.51]; yes vs. no), diet PC1 (OR=1.06, 95\% CI [1.03, 1.09], cardiovascular (OR=1.15, 95\% CI [1.07, 1.24]; yes vs. no), family history (OR=1.53, 95\% CI [1.38, 1.68]; yes vs. no), hypertension (OR=1.33, 95\% CI [1.24, 1.42]; yes vs. no), retirement (OR=1.29, 95\%CI [1.14, 1.45]; retired vs. unemployed), and number in household (OR=0.79, 95\% CI [0.74, 0.84]; $\geq$3 vs. 1~2) at the significance level with Bonferroni correction. Model with further adjustment on age and BMI revealed that Black ethnicity (OR=0.58, 95\% CI [0.43, 0.79]; Black vs. White), number of live births (OR=0.84, 95\% CI [0.77, 0.90]; 1~3 vs. 0 and OR=0.74, 95\% CI [0.64, 0.85]; >3 vs. 0), current alcohol drinker (OR=1.29, 95\% CI [1.12, 1.49]; current vs. never), family history of breast cancer (OR=1.49, 95\% CI [1.35, 1.64]; yes vs. no), hypertension (OR=1.22, 95\% CI [1.14, 1.31]; yes vs. no) and average total household income between 31,000~51,999 (OR=1.18, 95\% CI [1.08, 1.29]; 31,000~51,999 vs. <18,000) were significantly associated with breast cancer. (figure \ref{fig:1A.png} and Supplementary figure \ref{fig:2A.png}) For inner and outer subtypes of breast cancer, family history (OR=1.62, 95\% CI [1.27, 2.06] and OR=1.43, 95\% CI [1.20, 1.72] respectively; yes vs. no) and hypertension (OR=1.48, 95\% CI [1.23, 1.77] and OR=1.35, 95\% CI [1.19, 1.53] respectively; yes vs. no) had significant associations with the subtypes. (figure \ref{fig:1B.png}-\ref{fig:1C.png} and Supplementary figure \ref{fig:2B.png}-\ref{fig:2C.png})
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{overall_BC_forest.png}
+  \caption{Forest plot for overall breast cancer}
+  \label{fig:1A.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{inner_BC_forest.png}
+  \caption{Forest plot for inner quadrant breast cancer}
+  \label{fig:1B.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{outer_BC_forest.png}
+  \caption{Forest plot for outer quadrant breast cancer}
+  \label{fig:1C.png}
+\end{figure*}
+
+\subsection{Multiple logistic regression analysis}
+In the fully adjusted model [Figure \ref{fig:JK1.png}], variables independently associated with the breast cancer with significance with odds ratio (OR) $\geq$ 1.05 or $\leq$ 0.9 were [supplementary table \ref{tbl:full_tb.pdf}] :Black or other vs White ethnicity (OR $\leq$ 0.9, p < 10-2); sleep duration <7 vs 7-8 (OR = 0.88, 95\% CI [0.81–0.95], p = $2.5 \times 10^{-3}$); average total household income 31,000~51,999 vs <18,000 (OR = 1.11, 95\% CI [1.00–1.21], p = $4.4 × 10^{-2}$); live births number 1~3 or >3 vs 0 (OR $\leq$ 0.9, p < $10^{-2}$); BMI 30-40 or >40 vs <25 (OR $\leq$ 0.9, p < $1.02 \times 10^{-2}$); family history (yes vs no) (OR = 1.47, 95\% CI [1.34–1.62], p < $10^{-13}$); hypertension (yes vs no) (OR = 1.26, 95\% CI [1.16–1.36], p < $10^{-8}$); respiratory (yes vs no) (OR = 1.09, 95\% CI [1.01–1.17], p =2.71 × $10^{-2}$ ). When the model was sequentially adjusted, the strengths of the associations between the risk of breast cancer with the biomarkers and the environmental exposures were attenuated. Of the associations identified in the univariate analyses for risk of breast cancer, “Black or other vs White ethnicity”, “family history (yes vs no)”, and “hypertension (yes vs no)” were consistently identified significant in the fully adjusted model. 
+
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=1\textwidth]{JK1.png}
+  \caption{Odds ratio [95\% confidence intervals], and p-values from the logistic models for the probability of being breast cancer. Results are represented for sequentially adjusted models, where benchmark predictors are defined as demographic descriptors (Model 1), and models are additionally adjusted for lifestyle (Model 2), social variable (Model 3), female specific (Model 4),health risk (Model 5), biomarkers (Model 6), medical risk (Model 7) and environment exposure (Model 8).}
+  \label{fig:JK1.png}
+\end{figure*}
+
+\subsection{Logistic lasso analysis}
+We used logistic LASSO models to account for correlation and joint contribution across covariates on overall breast cancer and its subtypes. These models with lambda.1se selected 16 variables for overall breast cancer (Figure \ref{fig:Figure 3a.png} and Supplementary \ref{fig:supplementary 3a.png}), 22 variables for inner quadrant subtype (Figure \ref{fig:Figure 4a.png} and Supplementary \ref{fig:supplementary 3b.png}) and 16 variables for outer quadrant subtype (Figure \ref{fig:Figure 5a.png} and Supplementary \ref{fig:supplementary 3c.png}). Among selected variables, family history of breast cancer ($\beta$ =0.362), Black and others ethnicity ($\beta_{Black}$ = -0.202, $\beta_{other}$ = -0.224), hypertension ($\beta$ =0.171) and age ($\beta$ =0.116) contributed largely to overall breast cancer with AUC of 0.561(Figure \ref{fig:Figure 3b.png}); Black and other ethnicity ($\beta_{Black}$ = -0.559, $\beta_{other}$ = -0.375), family history of breast cancer ($\beta$ =0.377), hypertension ($\beta$ = 0.273), BMI more than 40 ($\beta$ =-0.170), diabetes ($\beta$ =-0.139) and living in rented accommodation ($\beta$ =-0.109) contributed largely to inner quadrant subtype with AUC of 0.594 (Figure \ref{fig:Figure 4b.png}); hypertension ($\beta$ =0.249), family history of breast cancer ($\beta$ =0.204), Black and other ethnicity ($\beta_{Black}$ = -0.169, $\beta_{other}$ = -0.154), current smoking status ($\beta$ =0.122), and post-menopause ($\beta$ =0.106) contributed largely to outer quadrant subtype with AUC of 0.574 (Figure \ref{fig:Figure 5b.png}).
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{Figure 3a.png}
+  \caption{Logistic lasso for overall breast cancer}
+  \label{fig:Figure 3a.png}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{Figure 4a.png}
+  \caption{Logistic lasso for inner quadrant subtype}
+  \label{fig:Figure 4a.png}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{Figure 5a.png}
+  \caption{Logistic lasso for outer quadrant subtype}
+  \label{fig:Figure 5a.png}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{Figure 3b.png}
+  \caption{AUC for overall breast cancer}
+  \label{fig:Figure 3b.png}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{Figure 4b.png}
+  \caption{AUC for inner quadrant subtype}
+  \label{fig:Figure 4b.png}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{Figure 5b.png}
+  \caption{AUC for outer quadrant subtype}
+  \label{fig:Figure 5b.png}
+\end{figure}
+
+\subsection{Partial Least Squares}
+With relation to the loading direction of breast cancer status in PLS-DA, negative loadings in covariates were interpreted to have a deleterious effect on breast cancer development while positive loadings were indicative of a protective effect. The calibration of the sPLS-DA analysis for pooled cases selected 7 variables (Figure \ref{fig:pls_loadings.png}:A). Recruitment age, retirement, post-menopausal, hypertension and family history of breast cancer presented strong negative loadings. More than three people living in a household and Black ethnic group generated moderate to low positive loadings. In the stability analysis of size 7, all variables listed were stably selected except Black ethnicity. Calibration of sgPLS-DA selected a total of 2 groups with a sparsity parameter of 0.7, which were the demographic and the female-specific groups. 
+
+sPLS-DA calibration on the stratification of breast cancer cases by inner quadrant breast cancer selected 15 variables ((Figure \ref{fig:pls_loadings.png}:B).
+In the stability analysis of size 15, 7 were stably selected, these variables were recruitment age, retirement, diet PC1, hypertension and family history of breast cancer with negative loadings; black ethnicity, other ethnic group with positive loadings. Calibration of the sgPLS selected two groups: demographic and health risk groups. Negative loadings were consistently observed in recruitment age, normal BMI range, hypertension and respiratory diseases. Higher positive loadings were observed in black ethnicity and other ethnic group while lower positive loading was observed with obesity (BMI>40 kg/m$^2$). 
+
+sPLS-DA calibration on outer quadrant subtype selected 53 variables in total (Figure \ref{fig:pls_loadings.png}:C). The highest negative loadings were consistent with the findings from the base model of overall breast cancer. SgPLS-DA had chosen 2 groups (demographic and female-specific groups), with strong negative loadings in recruitment age, family history of breast cancer, post-menopause status and history of hormone replacement therapy. Positive loadings were observed in Asian ethnicity, Black ethnicity and other ethnic group. In the stability analysis for outer quadrant breast cancer, recruitment age, hypertension, more than three people living in a household and post-menopausal were highly selected, showing consistency with the base model. Results of stability analyses and calibration plots could be found in the supplementary materials. (Figure \ref{fig:stab_overall.png} - \ref{fig:stab_outer.png}). (Figure \ref{fig:spls_calibration.png}).
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=1\textwidth]{pls_loadings.png}
+  \caption{Results of PLS‐DA analyses for A) overall breast cancer B) inner quadrant subtype C) outer quadrant subtype. Loadings coefficients for sPLS‐DA and sgPLS‐DA in purple and blue respectively. sgPLS selected variable groups highlighted in pink for each model.}
+  \label{fig:pls_loadings.png}
+\end{figure*}
+
+\subsection{Sensitivity analysis}
+In order to examine whether the uncertainty of models exists under different constraints, which would yield different results and reduce the statistical power of our analysis, the adjusted univariate model was re-analysed and stratified by five assumptions: (1)Population with/without breast cancer family history(Figure \ref{fig:CR1.png}),  (2)population has/has not used oral contraceptives(Figure \ref{fig:CR2.png}) ,   (3)population with early(<12 years old)/normal(12-14 years old)/late(>14 years old) menarche(Figure \ref{fig:CR3.png}), (4)population with pre-/post-menopause (Figure \ref{fig:CR4.png}), and (5) population without/without history of stillbirth (Figure \ref{fig:CR5.png}). Although the effects of several covariates slightly fluctuated in these models, there was no strong evidence of mismatch found.
+
+\section{Discussion}
+In this study, we consistently found that the future risk of female breast cancer and its subtypes (inner quadrant and outer quadrant) were positively associated with recruitment age, family history of breast cancer, hypertension in all models, whereas being Black and Other ethnicity showed a protective effect. 
+
+In the fully adjusted model, we found that Black or other vs White ethnicity; sleep duration <7 vs 7-8; average total household income 31,000~51,999 vs <18,000; live births number 1~3 or >3 vs 0; BMI 30-40 or >40 vs <25; family history (yes vs no); hypertension (yes vs no); respiratory (yes vs no) were all independently associated with the risk of breast cancer. Protective effects of higher BMI were detected in the previous studies, but the biological mechanisms of the effects required further investigations. We found that the associations linking alcohol drinker Current vs Never and the risk of breast cancer were strongly attenuated while adjusting for the other covariates.
+
+We used logistic Lasso models to select variables and measured their joint contributions to the risk of breast cancer and its subtypes, capturing complex and combined effects. From overall and subtype analysis in breast cancer, logistic Lasso models consistently found that family history of breast cancer and hypertension were positively associated, while Black and others ethnicity was negatively associated. Our results were in line with other studies. Engmann et al. found that the odds ratio of family history on breast cancer was 1.71 (95\% CI 1.59–1.84) [13]. A cohort with over 113,000 women in the UK population also showed that women having two or more relatives with breast cancer had a 2.5-fold (95\% CI 1.83–3.47) risk of developing breast cancer [14], implying an underlying influence of genetics. A familial breast cancer research found that 50–85\% of women with mutations in BRCA1 and BRCA2 would develop breast cancer during their lifetime and these mutations could be inherited and enriched in families [15]. Li et al. and Choi et al. reported that uncommon mutations, like PTEN and ATM, could also lead to breast and ovarian cancer [16,17]. Moreover, several systematic reviews and meta-analysis reported statistically significant association between hypertension and increased breast cancer risk (RR: 1.15; 95\% CI: 1.08, 1.22) [18] and possible mechanisms had been proposed to explain this relationship. There were some evidence showing that breast cancer and hypertension share a common pathophysiological pathway mediated by adipose tissue, which could initiate chronic inflammation and increase risk of both breast cancer and hypertension [19,20,21]. Secondly, hypertension may increase breast cancer risk by blocking and subsequently modifying mechanism of apoptosis, thereby affecting the regulation of cell turnover [22,23]. The relationships between Black and other ethnicity and breast cancer observed in our study were not fully supported from other literature evidence [24]. However, Black and others ethnicity only accounted for 1.9\% and 2.3\% respectively in our study population which might imposed some uncertainty in our findings. Further work should be conducted focusing on investigating of such associations in more racially balanced cohort. 
+
+Results from PLS-DA analysis on pooled cases and subtypes presented consistent and similar findings to logistic Lasso models. Moreover, we identified  slight differential pattern in loadings and group assignments of inner quadrant subtype compared to that of other subtypes. In particular, negative loading of diet PC1 was identified in sPLS-DA analysis and stably selected in the inner subtype model, indicating a negative impact on cancer risk. Nutrition has been previously described to play a role in 35\% of cancer aetiology [25]. A possible mechanism linking the consumption of red meat to breast cancer development has been proposed by Rose et al, where the accumulation of adipose tissue from pursuing a high fat diet might indirectly increase the amount of free-circulating oestrogen, leading to the activation of breast growth by hormonal stimulations [26]. Further investigation is needed to confirm this association and examine how dietary choice contributes to the formation of breast cancer subtypes. Low positive loading was observed in obesity of the inner subtype model demonstrating protective effect to breast cancer development. This association had been detailed in some studies with controversial findings amongst pre- and post-menopausal women of hormone-receptor positive breast cancer, which required further research to validate the robustness of such findings. Studies had suggested that obesity generated a 20-40\% increased risk of developing hormone-receptor positive breast cancer in post-menopausal women whereas associated with a reduced risk in pre-menopausal obese individuals [27]. In future work, ROC and AUC with additive effect on variable groups would be beneficial to identify how the inclusion of each category impacts the overall model prediction and could be compared to results from sgPLS models.
+
+Our study has the advantages of sampling participants from the UK Biobank, consisting of a large population size and availability on a wide range of risk factors detailing systematic differences between individual characteristics. We identified robust and consistent associations of risk factors with relation to breast cancer using a series of statistical analysis to study the individual and joint effects of covariates using univariate to multivariate techniques. There are several limitations to our findings that might reduce generalisability our study results. Firstly, the UK biobank data employed participants of older age with higher socio-economic status [28]. Due to the selection bias of healthy controls and the over-representation of White ethnicity in our study population, our dataset contained a limited number of other racial groups which might not be representative of the general population in the country [29]. In addition, some of the lifestyle related factors included in our dataset such as exposure to maternal smoking at birth, were self-reported and therefore some uncertainty might have been introduced in our models though possible response bias. Finally, the UK Biobank did not contain information on molecular signatures of breast cancer (ER, PR and HER2 status), thus we stratified our breast cancer subtypes by the position of breast tumour, which is less common in literature research of breast cancer and more difficult to compare our findings on inner and outer quadrant breast cancer to similar published literature.  
+
+\section{Conclusion}
+Large prospective cohort like the UK biobank enabled us to identify independent and joint associations of covariates with the future risk of breast cancer. We found robust associations that post-menopausal, older, hypertensive women with first degree family history contributed to an increased risk of breast cancer development. Our study provided a theoretical basis of risk factors involved in breast cancer and facilitated further research on the understanding breast cancer etiology with relation to the associated findings. Further analysis could be considered to integrate genetic information from the UK Biobank to explore polygenic risk score as a predictor of breast cancer and applying time-to-event models such as Cox regression to incorporate the length of time to breast cancer diagnosis. As our study focused solely on the female population, it would also be valuable to validate our findings on the male cohort as an additional sensitivity analysis to our study.
+
+\section{Author Contributions}
+All authors discussed and finalized the analytical plan. 01814471, 01333689, 01377486 and 01913993 extracted variables from biobank and 01808753 did data processing. For statistical analysis, 01902920 did descriptive analysis, 01333689 for univariate analysis, 01808753 for Lasso regression, 01377486 for PLS analysis, 01913993 for fully adjusted model and 01814471 for sensitivity analysis. For writing manuscript, each author finished their own part in results and discussions. 01902920, 01814471, 01913993 were responsible for abstract and introduction and 01377486, 01333689, 01808753 for method and conclusion. All authors approved the final draft.
+%\clearpage
+\clearpage
+%\clearpage
+\bibliographystyle{ACM-Reference-Format}
+
+\newpage
+\begin{thebibliography}
+\\
+[1]: Bray F, Ferlay J, Soerjomataram I, et al. Global cancer statistics 2018: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries. CA Cancer J Clin. 2018;68(6):394-424. \\
+
+[2]: Who.int. 2021. Latest global cancer data: Cancer burden rises to 18.1 million new cases and 9.6 million cancer deaths in 2018. [online] Available at: <https://www.who.int/cancer/PRGlobocanFinal.pdf> [Accessed 5 May 2021].\\
+
+[3]: Cancer Research UK. 2021. Breast cancer incidence (invasive) statistics. [online] Available at: <https://www.cancerresearchuk.org/health-professional/cancer-statistics/statistics-by-cancer-type/breast-cancer/incidence-invasive\#heading-Three> [Accessed 5 May 2021].\\
+
+[4] Bray F, McCarron P, Parkin DM. The changing global patterns of female breast cancer incidence and mortality. Breast Cancer Res. 2004;6(6):229-239.\\
+
+[5] Al-Ajmi K, Lophatananon A, Ollier W, et al. Risk of breast cancer in the UK biobank female cohort and its relationship to anthropometric and reproductive factors. PLoS One. 2018;13(7):e0201097. 
+
+[6]: UK-Biobank (2010) UK Biobank. Protocol for a large-scale prospective epidemiological resources [Online] http://www.ukbiobank.ac.uk/wp-content/uploads/2011/11/UK-Biobank-Protocol.pdf Accessed 10 July 2016.\\
+
+[7] Schwedhelm C, Iqbal K, Knüppel S, et al. Contribution to the understanding of how principal component analysis-derived dietary patterns emerge from habitual data on food consumption. Am J Clin Nutr. 2018;107(2):227-235.\\
+
+[8] Castelló A, Lope V, Vioque J, et al. Reproducibility of data-driven dietary patterns in two groups of adult Spanish women from different studies. Br J Nutr. 2016;116(4):734-742\\
+
+[9] Fransen HP, May AM, Stricker MD, et al. A posteriori dietary patterns: how many patterns to retain? J Nutr. 2014;144(8):1274-1282.\\
+
+[10] Kim JO, Mueller CW. Factor analysis: statistical methods and practical issues. Thousand Oaks: Sage Publications; 1978.\\
+
+[11] Lunardon N, Menardi G, Torelli N. ROSE: A package for binary imbalanced learning. R Journal, 2014;6(1):79–89.\\
+
+[12] Jordan I, Hebestreit A, Swai B, et al. Dietary patterns and breast cancer risk among women in northern Tanzania: a case-control study. Eur J Nutr. 2013;52(3):905-915. \\
+
+[13] Engmann NJ, Golmakani MK, Miglioretti DL, Sprague BL, Kerlikowske K; Breast Cancer Surveillance Consortium. Population-Attributable Risk Proportion of Clinical Risk Factors for Breast Cancer. JAMA Oncol. 2017;3(9):1228-1236.  \\
+
+[14] Brewer HR, Jones ME, Schoemaker MJ, et al. Family history and risk of breast cancer: an analysis accounting for family structure. Breast Cancer Res Treat. 2017;165(1):193-200. \\
+
+[15] Thompson ER, Rowley SM, Li N, et al. Panel Testing for Familial Breast Cancer: Calibrating the Tension Between Research and Clinical Care. J Clin Oncol. 2016;34(13):1455-1459.  \\
+
+[16] Li S, Shen Y, Wang M, et al. Loss of PTEN expression in breast cancer: association with clinicopathological characteristics and prognosis. Oncotarget. 2017;8(19):32043-32054.\\
+
+[17] Choi M, Kipps T, Kurzrock R. ATM Mutations in Cancer: Therapeutic Implications. Mol Cancer Ther. 2016;15(8):1781-1791. \\
+
+[18] Han H, Guo W, Shi W, et al. Hypertension and breast cancer risk: a systematic review and meta-analysis. Sci Rep. 2017;7:44877. \\
+
+[19] Largent JA, McEligot AJ, Ziogas A, et al. Hypertension, diuretics and breast cancer risk. J Hum Hypertens. 2006;20(10):727-732.\\
+
+[20] Balkwill F, Charles KA, Mantovani A. Smoldering and polarized inflammation in the initiation and promotion of malignant disease. Cancer Cell. 2005;7(3):211-217. \\
+
+[21] Li JJ, Fang CH, Hui RT. Is hypertension an inflammatory disease? Med Hypotheses. 2005;64(2):236-240. \\
+
+[22] Hamet P. Cancer and hypertension. An unresolved issue. Hypertension. 1996;28(3):321-324. \\
+
+[23] Hamet P. Cancer and hypertension: a potential for crosstalk? J Hypertens. 1997;15(12 Pt 2):1573-1577. \\
+
+[24] Brennan M. Breast cancer in ethnic minority groups in developed nations: Case studies of the United Kingdom and Australia. Maturitas. 2017 May;99:16-19. \\
+
+[25] Doll R, Peto R. The causes of cancer: quantitative estimates of avoidable risks of cancer in the United States today. J Natl Cancer Inst. 1981;66(6):1191-308. \\
+
+[26] Rose DP. Effects of dietary fatty acids on breast and prostate cancers: evidence from in vitro experiments and animal studies. Am J Clin Nutr. 1997;66(6 Suppl):1513S-1522S. \\
+
+[27] Munsell MF, Sprague BL, Berry DA, et al. Body mass index and breast cancer risk according to postmenopausal estrogen-progestin use and hormone receptor status. Epidemiol Rev. 2014;36(1):114-36. \\
+
+[28] Khanji MY, Aung N, Chahal CAA, et al. COVID-19 and the UK Biobank-Opportunities and Challenges for Research and Collaboration With Other Large Population Studies. Front Cardiovasc Med. 2020;27;7:156.\\
+
+[29] Fry A, Littlejohns TJ, Sudlow C, et al. Comparison of Sociodemographic and Health-Related Characteristics of UK Biobank Participants With Those of the General Population. Am J Epidemiol. 2017;186(9):1026-1034.
+\end{thebibliography}
+
+
+%\clearpage
+%\clearpage
+
+\section*{SUPPLEMENTARY MATERIALS}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{scree.png}
+  \caption{Scree plot for dietary pattern}
+  \label{fig:Scree plot.png}
+\end{figure}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{overall_BC_Manhattan.png}
+  \caption{Manhattan plot for overall breast cancer}
+  \label{fig:2A.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{inner_BC_Manhattan.png}
+  \caption{Manhattan plot for inner quadrant breast cancer}
+  \label{fig:2B.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{outer_BC_Manhattan.png}
+  \caption{Manhattan plot for outer quadrant breast cancer}
+  \label{fig:2C.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{supplementary 3a.png}
+  \caption{Calibration of logistic lasso for outer breast cancer}
+  \label{fig:supplementary 3a.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{supplementary 3b.png}
+  \caption{Calibration of logistic lasso for inner breast cancer}
+  \label{fig:supplementary 3b.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{supplementary 3c.png}
+  \caption{Calibration of logistic lasso for outer breast cancer}
+  \label{fig:supplementary 3c.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.8\textwidth]{spls_calibration.png}
+  \caption{Calibration results of sPLS on one component for A) overall breast cancer B) inner quadrant subtype C) outer quadrant subtype and D) sgPLS calibration results for overall breast cancer. In each calibration plot, X-axis indicated number of parameters and Y-axis represented misclassification rate. The optimal number of parameters yielding the lowest misclassification rate for each model calibration was highlighted in red. }
+  \label{fig:spls_calibration.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{stab_overall.png}
+  \caption{Sensitivity analysis and selection proportion of sPLS findings on model of overall breast cancer}
+  \label{fig:stab_overall.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{stab_inner.png}
+  \caption{Sensitivity analysis and selection proportion of sPLS findings on model of inner breast cancer}
+  \label{fig:stab_inner.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{stab_outer.png}
+  \caption{Sensitivity analysis and selection proportion of sPLS findings on model of outer breast cancer}
+  \label{fig:stab_outer.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{CR1.png}
+  \caption{Sensitivity analysis on breast cancer family history}
+  \label{fig:CR1.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{CR2.png}
+  \caption{Sensitivity analysis on oral contraceptives use}
+  \label{fig:CR2.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{CR3.png}
+  \caption{Sensitivity analysis on menarche age}
+  \label{fig:CR3.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{CR4.png}
+  \caption{Sensitivity analysis on menopause}
+  \label{fig:CR4.png}
+\end{figure*}
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{CR5.png}
+  \caption{Sensitivity analysis on history of stillbirth}
+  \label{fig:CR5.png}
+\end{figure*}
+
+
+
+
+
+
+
+\begin{table*}[h]
+    \caption{Odds ratio [95\% confidence intervals], and p-values from the logistic models for the probability of breast cancer. Results are represented for sequentially adjusted models, where benchmark predictors are defined as demographic descriptors (Model 1), and models are additionally adjusted for lifestyle (Model 2), social variable (Model 3), female specific (Model 4), health risk (Model 5), biomarkers (Model 6), medical risk (Model 7) and environment exposure (Model 8).}
+    
+  \begin{center}
+    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{full_tb.pdf}
+    \label{tbl:full_tb.pdf}
+  \end{center}
+\end{table*}
+
+\end{document}
+\endinput
