@@ -8,3 +8,10 @@ The UK Biobank dataset was used to study 43 variables of 8 categories in our stu
 
 ### Contributing
 CID: 01913993, 01814471, 01808753, 01333689, 01377486, 01902920
+
+### Full Report and Latex Slides
+Full Report
+https://drive.google.com/file/d/1-RzoKD23LyKy5Ff7nm-xRoJeake99wlc/view?usp=sharing
+
+Latex Slides
+https://drive.google.com/file/d/1-SN5cWPKj9dxBoZkEcExpYp2sfFzYY22/view?usp=sharing
